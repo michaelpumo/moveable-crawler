@@ -17,9 +17,8 @@
     }
   },
   "scripts": {
-    "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "watch": "tsc && vite build --watch"
   },
   "dependencies": {
     "happy-dom": "^9.10.1"

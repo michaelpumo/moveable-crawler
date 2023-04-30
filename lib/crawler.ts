@@ -51,7 +51,6 @@ export class Crawler {
 
     const links: IElement[] = [...document.querySelectorAll('a')]
 
-    // // console.log(links)
     console.log(this.#baseUrl, this.#links)
 
     for (const link of links) {
