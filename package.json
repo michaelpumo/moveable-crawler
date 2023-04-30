@@ -1,0 +1,41 @@
+{
+  "name": "@michaelpumo/moveable-crawler",
+  "description": "A simple link crawler built with JavaScript",
+  "version": "0.0.0",
+  "type": "module",
+  "author": "Michael Pumo",
+  "license": "ISC",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/moveable-crawler.umd.cjs",
+  "module": "./dist/moveable-crawler.js",
+  "exports": {
+    ".": {
+      "import": "./dist/moveable-crawler.js",
+      "require": "./dist/moveable-crawler.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "happy-dom": "^9.10.1"
+  },
+  "devDependencies": {
+    "pathe": "^1.1.0",
+    "prettier": "^2.8.8",
+    "typescript": "^5.0.4",
+    "vite": "^4.3.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelpumo/moveable-crawler.git"
+  },
+  "bugs": {
+    "url": "https://github.com/michaelpumo/moveable-crawler/issues"
+  },
+  "homepage": "https://github.com/michaelpumo/moveable-crawler#readme"
+}
