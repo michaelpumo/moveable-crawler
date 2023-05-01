@@ -1,7 +1,7 @@
 {
   "name": "@michaelpumo/moveable-crawler",
   "description": "A simple link crawler built with JavaScript",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "author": "Michael Pumo",
   "license": "ISC",
@@ -21,9 +21,10 @@
     "watch": "tsc && vite build --watch"
   },
   "dependencies": {
-    "happy-dom": "^9.10.1"
+    "jsdom": "^21.1.2"
   },
   "devDependencies": {
+    "@types/jsdom": "^21.1.1",
     "pathe": "^1.1.0",
     "prettier": "^2.8.8",
     "typescript": "^5.0.4",

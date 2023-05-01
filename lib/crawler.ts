@@ -1,26 +1,37 @@
-import { IElement, Window } from 'happy-dom'
+import { JSDOM } from 'jsdom'
 
 export class Crawler {
-  #baseUrl: string
-  #links: string[]
-
-  constructor(url: string) {
-    this.#baseUrl = this.#normalise(url)
-    this.#links = []
+  #pages: {
+    [key: string]: number
   }
 
-  #normalise(url: string) {
-    const { hostname, pathname } = new URL(url)
-    const full = `${hostname}${pathname}`
-
-    return full.length && full.slice(-1) === '/' ? full.slice(0, -1) : full
+  constructor() {
+    this.#pages = {}
   }
 
-  async crawlPage(currentUrl: string) {
-    console.log(`Crawling: ${currentUrl}`)
+  async crawl(baseUrl: string, currentURL: string) {
+    const currentUrlObj = new URL(currentURL)
+    const baseUrlObj = new URL(baseUrl)
+
+    if (currentUrlObj.hostname !== baseUrlObj.hostname) {
+      return this.#pages
+    }
+
+    const normalizedURL = this.#normalizeUrl(currentURL)
+
+    if (this.#pages[normalizedURL]) {
+      this.#pages[normalizedURL]++
+      return this.#pages
+    }
+
+    this.#pages[normalizedURL] = 1
+
+    // console.info(`Crawling ${currentURL}`)
+
+    let htmlBody = ''
 
     try {
-      const response = await fetch(currentUrl)
+      const response = await fetch(currentURL)
 
       if (response.status >= 400) {
         throw new Error(
@@ -34,35 +45,64 @@ export class Crawler {
         throw new Error(`Content type of '${contentType}' is not HTML.`)
       }
 
-      const html = await response.text()
-      this.getUrls(html)
+      htmlBody = await response.text()
     } catch (error: any) {
-      console.log(`${error.name}: ${error.message}`)
+      // console.error(error.message)
+      console.log('AAA')
+      return this.#pages
     }
+
+    const nextUrls = this.#getUrls(htmlBody, baseUrl)
+
+    for (const nextUrl of nextUrls) {
+      await this.crawl(baseUrl, nextUrl)
+    }
+
+    return this.#pages
   }
 
-  getUrls(documentHtml: string) {
-    const window = new Window()
-    const document = window.document
-
-    document.body.innerHTML = `${documentHtml}`
-
-    console.log(document)
-
-    const links: IElement[] = [...document.querySelectorAll('a')]
-
-    console.log(this.#baseUrl, this.#links)
+  #getUrls(htmlBody: string, baseUrl: string) {
+    const urls: string[] = []
+    const dom = new JSDOM(htmlBody)
+    const links = dom.window.document.querySelectorAll('a')
 
     for (const link of links) {
-      // const { href } = link
-      // console.log(href)
-      console.log(link.getAttribute('href'))
+      const href = link.getAttribute('href')
+      const path = href?.trim()
 
-      // if (link.startsWith('/')) {
-      //   this.#links.push(`${this.#baseUrl}${link.href}`)
-      // } else {
-      //   this.#links.push(link.href)
-      // }
+      if (
+        path &&
+        path.slice(0, 1) !== '#' &&
+        path.slice(0, 7) !== 'mailto:' &&
+        path.length
+      ) {
+        // console.log(path)
+        if (path.slice(0, 1) === '/') {
+          try {
+            urls.push(new URL(path, baseUrl).href)
+          } catch (error: any) {
+            console.error(`${error.message}: ${path}`)
+          }
+        } else {
+          try {
+            urls.push(new URL(path).href)
+            console.log(new URL(path).href)
+          } catch (error: any) {
+            console.error(`${error.message}: ${path}`)
+          }
+        }
+      }
     }
+
+    return urls
+  }
+
+  #normalizeUrl(url: string) {
+    const urlObj = new URL(url)
+    const fullPath = `${urlObj.host}${urlObj.pathname}`
+
+    return fullPath.length && fullPath.slice(-1) === '/'
+      ? fullPath.slice(0, -1)
+      : fullPath
   }
 }

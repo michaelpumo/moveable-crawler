@@ -14,10 +14,10 @@ export default defineConfig({
       formats: ['es', 'umd']
     },
     rollupOptions: {
-      external: ['happy-dom'],
+      external: ['jsdom'],
       output: {
         globals: {
-          ['happy-dom']: 'happy-dom'
+          jsdom: 'jsdom'
         }
       }
     }
