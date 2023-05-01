@@ -1,15 +1,16 @@
 import { JSDOM } from 'jsdom'
 
 export class Crawler {
-  #pages: {
-    [key: string]: number
-  }
+  #pages: Record<string, number>
 
   constructor() {
     this.#pages = {}
   }
 
-  async crawl(baseUrl: string, currentURL: string) {
+  async crawl(
+    baseUrl: string,
+    currentURL: string
+  ): Promise<Record<string, number>> {
     const currentUrlObj = new URL(currentURL)
     const baseUrlObj = new URL(baseUrl)
 
@@ -46,7 +47,7 @@ export class Crawler {
       }
 
       htmlBody = await response.text()
-    } catch (error: any) {
+    } catch (error) {
       // console.error(error.message)
       console.log('AAA')
       return this.#pages
@@ -61,7 +62,7 @@ export class Crawler {
     return this.#pages
   }
 
-  #getUrls(htmlBody: string, baseUrl: string) {
+  #getUrls(htmlBody: string, baseUrl: string): string[] {
     const urls: string[] = []
     const dom = new JSDOM(htmlBody)
     const links = dom.window.document.querySelectorAll('a')
@@ -76,19 +77,19 @@ export class Crawler {
         path.slice(0, 7) !== 'mailto:' &&
         path.length
       ) {
-        // console.log(path)
+        // console.log(path);
         if (path.slice(0, 1) === '/') {
           try {
             urls.push(new URL(path, baseUrl).href)
-          } catch (error: any) {
-            console.error(`${error.message}: ${path}`)
+          } catch (error) {
+            console.error(`${error as Error}: ${path}`)
           }
         } else {
           try {
             urls.push(new URL(path).href)
             console.log(new URL(path).href)
-          } catch (error: any) {
-            console.error(`${error.message}: ${path}`)
+          } catch (error) {
+            console.error(`${error as Error}: ${path}`)
           }
         }
       }
@@ -97,7 +98,7 @@ export class Crawler {
     return urls
   }
 
-  #normalizeUrl(url: string) {
+  #normalizeUrl(url: string): string {
     const urlObj = new URL(url)
     const fullPath = `${urlObj.host}${urlObj.pathname}`
 
